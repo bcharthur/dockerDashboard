@@ -29,7 +29,9 @@ export function createDashboardTable() {
       { title:'Read MB', data:'rd'},
       { title:'Write MB',data:'wr'}
     ],
-    order:[]
+        order: [],
+    language: {
+      url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/fr-FR.json'}
   });
 
   $('#contTable tbody').on('click','td.details-control',function(){
