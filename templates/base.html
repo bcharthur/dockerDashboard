@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Docker Dashboard{% endblock %}</title>
+
+  <!-- SB‑Admin‑2 (Bootstrap 4) -->
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet"
+        href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+  <!-- Chevron (row‑details) -->
+  <style>
+    td.details-control       { cursor:pointer; }
+    td.details-control::before {
+      content:'\f054';               /* FA chevron‑right */
+      font-family:"Font Awesome 5 Free";
+      font-weight:900;
+      color:#0d6efd; margin-right:4px;
+    }
+    tr.shown td.details-control::before {
+      content:'\f078';               /* chevron‑down */
+    }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body id="page-top">
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="#">
+        <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-chart-bar"></i></div>
+        <div class="sidebar-brand-text mx-3">DockerStats</div>
+      </a>
+      <hr class="sidebar-divider my-0">
+      <li class="nav-item active">
+        <a class="nav-link" href="/"><i class="fas fa-fw fa-tachometer-alt"></i><span>Dashboard</span></a>
+      </li>
+      <hr class="sidebar-divider d-none d-md-block">
+    </ul>
+    <!-- End Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+          <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+            <i class="fa fa-bars"></i>
+          </button>
+          <h1 class="h4 m-0">Docker Dashboard</h1>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="container-fluid">
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+    </div>
+  </div><!-- End Wrapper -->
+
+  <!-- jQuery puis Bootstrap bundle -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
+  <!-- FontAwesome -->
+  <script src="https://kit.fontawesome.com/b574da12d9.js" crossorigin="anonymous"></script>
+  <!-- SB‑Admin‑2 core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/js/sb-admin-2.min.js"></script>
+  <!-- DataTables -->
+  <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+  <!-- Socket.IO -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <!-- Modules applicatifs -->
+  <script type="module" src="/static/js/utils.js"></script>
+  <script type="module" src="/static/js/init.js"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

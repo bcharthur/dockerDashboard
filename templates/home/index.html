@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – Docker{% endblock %}
+
+{% block content %}
+    <div class="row">
+
+  <!-- Card CPU -->
+  <div class="col-xl-3 col-md-6 mb-4">
+    <div class="card border-left-primary shadow h-100 py-2">
+      <div class="card-body">
+        <div class="row no-gutters align-items-center">
+          <div class="col mr-2">
+            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+              Container CPU usage
+            </div>
+            <div class="h5 mb-0 font-weight-bold text-gray-800" id="cpuVal">0 %</div>
+            <div class="small text-gray-600" id="cpuMax">/ 0 % (0 CPUs)</div>
+          </div>
+          <div class="col-auto"><i class="fas fa-microchip fa-2x text-gray-300"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card RAM -->
+<div class="card border-left-success shadow h-100 py-2">
+  <div class="card-body">
+    <div class="row no-gutters align-items-center">
+      <div class="col mr-2">
+        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+          Container memory usage
+          <!-- icône info -->
+          <i class="fas fa-info-circle text-gray-400"
+             data-toggle="tooltip"
+             data-placement="right"
+             title="Mémoire utilisée = usage - cache pages.
+Limit = quota VM Docker Desktop."></i>
+        </div>
+        <div class="h5 mb-0 font-weight-bold text-gray-800" id="memVal">0 MB</div>
+        <div class="small text-gray-600" id="memMax">/ 0 GB</div>
+      </div>
+      <div class="col-auto"><i class="fas fa-memory fa-2x text-gray-300"></i></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+<div class="card shadow mb-4">
+  <div class="card-header py-3">
+    <h6 class="m-0 font-weight-bold text-primary">Conteneurs actifs</h6>
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+    <table id="contTable" class="table table-bordered" width="100%">
+  <thead>
+    <tr>
+      <th></th>                       <!-- colonne chevron -->
+      <th>Nom</th><th>CPU %</th><th>RAM %</th>
+      <th>RAM</th><th>Read MB</th><th>Write MB</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+{% endblock %}
