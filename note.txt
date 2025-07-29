@@ -1,0 +1,23 @@
+#Démarrer projet
+python -m venv .venv
+source .venv/bin/activate
+
+#Ouvrir le port 5002
+sudo ufw allow 5002/tcp
+sudo ufw reload
+
+#Fermer le port 5002
+sudo ufw deny 5002/tcp
+sudo ufw reload
+
+#Supprimer la règle
+sudo ufw delete allow 5002/tcp
+sudo ufw reload
+
+#Vérifier l’état du firewall
+sudo ufw status numbered
+
+
+
+#Ouvrir le projet que pour des IPS persos
+sudo ufw allow from MON_IP_PERSO to any port 5002 proto tcp

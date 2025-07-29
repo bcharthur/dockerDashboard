@@ -1,0 +1,15 @@
+# Ignorer les environnements virtuels Python
+.venv/
+venv/
+
+# Ignorer les caches de Python
+__pycache__/
+*.pyc
+
+# Autres fichiers/dossiers à ignorer
+*.log
+*.sqlite3
+.env
+.DS_Store
+.idea/
+*.swp
