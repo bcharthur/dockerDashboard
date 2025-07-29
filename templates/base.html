@@ -65,7 +65,8 @@
   </div><!-- End Wrapper -->
 
 <!-- Modal de chargement -->
-<div class="modal fade show" id="loadingModal" tabindex="-1" role="dialog" aria-hidden="true" style="display: block; background: rgba(0,0,0,0.35)">
+<div class="modal fade" id="loadingModal" tabindex="-1" role="dialog" aria-hidden="true"
+     data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content shadow">
       <div class="modal-body text-center py-5">
@@ -82,6 +83,7 @@
 
 
 
+
   <!-- jQuery puis Bootstrap bundle -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.bundle.min.js"></script>
@@ -93,6 +95,9 @@
   <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
   <!-- Socket.IO -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Modules applicatifs -->
   <script type="module" src="/static/js/utils.js"></script>
