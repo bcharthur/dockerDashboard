@@ -44,6 +44,32 @@ Limit = quota VM Docker Desktop."></i>
   </div>
 </div>
 
+    <div class="col-xl-3 col-md-6 mb-4">
+  <div class="card border-left-info shadow h-100 py-2">
+    <div class="card-body">
+      <div class="row no-gutters align-items-center">
+        <div class="col mr-2">
+          <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+            Hardware info
+          </div>
+          <div class="small mb-2">
+            <b>CPU :</b> {{ hwinfo.cpu_name }} <br>
+            <b>Cœurs :</b> {{ hwinfo.cpu_count }} <br>
+            <b>RAM :</b> {{ (hwinfo.ram_total // (1024*1024*1024)) }} GB <br>
+            <b>Disque ({{ hwinfo.disk_device }}) :</b>
+            {{ (hwinfo.disk_free // (1024*1024*1024)) }} GB libres /
+            {{ (hwinfo.disk_total // (1024*1024*1024)) }} GB
+          </div>
+        </div>
+        <div class="col-auto">
+          <i class="fas fa-server fa-2x text-gray-300"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 </div>
 <div class="card shadow mb-4">
