@@ -20,4 +20,12 @@ start_metrics_task(socketio)
 if __name__ == '__main__':
     port = 5002
     print(f'🚀  Dashboard sur http://localhost:{port}')
-    socketio.run(app, host='0.0.0.0', port=port, debug=True)
+    socketio.run(
+        app,
+        host='0.0.0.0',
+        port=port,
+        debug=True,        # ou False si tu préfères
+        use_reloader=False # désactive le reloader pour éviter le double bind
+    )
+
+

@@ -1,102 +1,115 @@
+// static/js/datatable.js
 import { formatBytesMBGB } from './utils.js';
 
-const parentMap = new Map();          // project → DataTables row()
-function projectOf(name) {
-  const p = name.split('-');
-  return p.length >= 3 ? p.slice(0, -2).join('-') : name;
-}
-function tNum(x, d=1) { return x.toFixed(d) + ' %'; }
-function serviceRow(c) {
-  return `<tr data-svc="${c.name}">
-     <td>${c.name}</td>
-     <td class="cpu">${tNum(c.cpu_pct)}</td>
-     <td class="ramp">${tNum(c.mem_pct)}</td>
-     <td class="ram">${formatBytesMBGB(c.mem_used)} / ${formatBytesMBGB(c.mem_lim)}</td>
-     <td class="rd">${c.rd_mb.toFixed(1)}</td>
-     <td class="wr">${c.wr_mb.toFixed(1)}</td>
-   </tr>`;
+const tNum = (x, d = 1) => x.toFixed(d) + ' %';
+
+// stocke les raw rows groupées
+let groupData = {};
+
+// mémorise quels groupes sont ouverts
+const expanded = new Set();
+
+// extrait “bouchaud” de “wp_bouchaud”
+function getGroup(name) {
+  const parts = name.split('_');
+  return parts.length > 1 ? parts.slice(1).join('_') : name;
 }
 
-/* ─── Création ─── */
+// HTML du tableau enfant
+function buildChildHtml(grp) {
+  const list = groupData[grp] || [];
+  return `<table class="table table-sm mb-0">
+    <thead class="thead-light">
+      <tr>
+        <th>Service</th><th>CPU %</th><th>RAM %</th><th>RAM</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${list.map(c => `
+        <tr class="table-light">
+          <td>${c.name}</td>
+          <td>${tNum(c.cpu_pct)}</td>
+          <td>${tNum(c.mem_pct)}</td>
+          <td>${formatBytesMBGB(c.mem_used)} / ${formatBytesMBGB(c.mem_lim)}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>`;
+}
+
 export function createDashboardTable() {
   const dt = $('#contTable').DataTable({
+    data: [],                      // on ajoutera les parents plus tard
+    rowId: row => `parent_${row.name}`,
     columns: [
-      { className:'details-control', orderable:false, data:null, defaultContent:'' },
-      { title:'Nom',  data:'name' },
-      { title:'CPU %',data:'cpu'  },
-      { title:'RAM %',data:'ramp' },
-      { title:'RAM',  data:'ram'  },
-      { title:'Read MB', data:'rd'},
-      { title:'Write MB',data:'wr'}
+      {
+        className: 'details-control',
+        orderable: false,
+        data: null,
+        defaultContent: ''         // la cellule cliquable pour expand / collapse
+      },
+      { title: 'Nom',   data: 'name' },
+      { title: 'CPU %', data: 'cpu'  },
+      { title: 'RAM %', data: 'ramp' },
+      { title: 'RAM',   data: 'ram'  }
     ],
-        order: [],
+    order: [[1, 'asc']],           // par défaut, tri alphabetique sur la colonne Nom
     language: {
-      url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/fr-FR.json'}
+      url: 'https://cdn.datatables.net/plug‑ins/1.13.8/i18n/fr‑FR.json'
+    }
   });
 
-  $('#contTable tbody').on('click','td.details-control',function(){
-    const tr=$(this).closest('tr'); const row=dt.row(tr);
-    if(row.child.isShown()){ row.child.hide(); tr.removeClass('shown'); }
-    else { row.child.show(); tr.addClass('shown'); }
+  // click sur la chevron (colonne 0) d'un parent
+  $('#contTable tbody').on('click', 'td.details-control', function() {
+    const tr   = $(this).closest('tr');
+    const row  = dt.row(tr);
+    const data = row.data();
+    const grp  = data.name;
+
+    if (row.child.isShown()) {
+      row.child.hide();
+      tr.removeClass('shown');
+      expanded.delete(grp);
+    } else {
+      row.child(buildChildHtml(grp)).show();
+      tr.addClass('shown');
+      expanded.add(grp);
+    }
   });
+
   return dt;
 }
 
-/* ─── Mise à jour ─── */
-export function updateDashboardTable(table, raw) {
-  /* Regroupement projects */
-  const groups={};
-  raw.forEach(r=>(groups[projectOf(r.name)]??=[]).push(r));
+export function updateDashboardTable(dt, raw) {
+  // 1) regrouper raw par projet
+  groupData = {};
+  raw.forEach(r => {
+    const grp = getGroup(r.name);
+    (groupData[grp] = groupData[grp] || []).push(r);
+  });
 
-  /* Màj ou création parents */
-  Object.entries(groups).forEach(([proj,list])=>{
-    const cpu=list.reduce((a,c)=>a+c.cpu_pct,0);
-    const mem=list.reduce((a,c)=>a+c.mem_used,0);
-    const lim=list[0].mem_lim||1;
-
-    const parentData={
-      name:proj,
-      cpu: tNum(cpu),
-      ramp:tNum(mem/lim*100),
-      ram: `${formatBytesMBGB(mem)} / ${formatBytesMBGB(lim)}`,
-      rd:'',wr:''
+  // 2) ne garder que les parents pour le DataTable
+  const parents = Object.entries(groupData).map(([grp, list]) => {
+    const cpuSum = list.reduce((a,c) => a + c.cpu_pct, 0);
+    const memSum = list.reduce((a,c) => a + c.mem_used, 0);
+    const lim    = list[0].mem_lim || 1;
+    return {
+      name: grp,
+      cpu:  tNum(cpuSum),
+      ramp: tNum(memSum / lim * 100),
+      ram:  `${formatBytesMBGB(memSum)} / ${formatBytesMBGB(lim)}`
     };
-
-    if(parentMap.has(proj)){               // déjà présent → update
-      const row=parentMap.get(proj);
-      row.data(parentData);
-      if(row.child.isShown()){
-        // maj tbody service par service
-        list.forEach(c=>{
-          const tr=row.child().find(`tr[data-svc="${c.name}"]`);
-          if(tr.length){
-            tr.find('.cpu').text(tNum(c.cpu_pct));
-            tr.find('.ramp').text(tNum(c.mem_pct));
-            tr.find('.ram').text(`${formatBytesMBGB(c.mem_used)} / ${formatBytesMBGB(c.mem_lim)}`);
-            tr.find('.rd').text(c.rd_mb.toFixed(1));
-            tr.find('.wr').text(c.wr_mb.toFixed(1));
-          }
-        });
-      }
-    }else{                                 // nouveau projet
-      const row=table.row.add(parentData).row();
-      row.node().id=`row-${proj}`;
-      const childHTML=
-       `<table class="table table-sm mb-0">
-          <thead class="thead-light">
-            <tr><th>Service</th><th>CPU %</th><th>RAM %</th><th>RAM</th><th>Read MB</th><th>Write MB</th></tr>
-          </thead><tbody>${list.map(serviceRow).join('')}</tbody></table>`;
-      row.child(childHTML).hide();
-      parentMap.set(proj,row);
-    }
   });
 
-  /* Supprime parents disparus */
-  [...parentMap.keys()].forEach(proj=>{
-    if(!groups[proj]){
-      parentMap.get(proj).remove(); parentMap.delete(proj);
+  // 3) recharger le DataTable (parents uniquement), garder pagination/tri
+  dt.clear().rows.add(parents).draw(false);
+
+  // 4) ré-ouvrir les groupes qui l'étaient
+  expanded.forEach(grp => {
+    const row = dt.row(`#parent_${grp}`);
+    if (row.node()) {
+      row.child(buildChildHtml(grp)).show();
+      $(row.node()).addClass('shown');
     }
   });
-
-  table.draw(false);
 }
