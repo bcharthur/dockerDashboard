@@ -16,7 +16,11 @@ SSH_KEY_PATH = os.getenv('SSH_KEY_PATH')  # chemin vers la clé privée, ou vide
 SSH_PASSWORD = os.getenv('SSH_PASSWORD')  # mot de passe en clair dans .env
 
 # Client Docker local pointant vers le Docker du VPS via tunnel SSH
-client = docker.DockerClient(base_url=os.getenv('DOCKER_HOST_URL', 'tcp://localhost:2375'))
+client = (
+    docker.DockerClient(base_url=os.getenv("DOCKER_HOST_URL"))
+    if os.getenv("DOCKER_HOST_URL")
+    else docker.from_env()          # gère npipe://, ssh://, unix://, etc.
+)
 
 
 def _ssh_cmd(cmd: str) -> str:
